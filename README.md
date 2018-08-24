@@ -1,0 +1,2 @@
+# wxarticle2md
+把微信公众号文章转换成markdown语法文章
