@@ -13,6 +13,7 @@ func TestToArticle(t *testing.T) {
 
 	h, _ := GetHtml(url)
 	a, _ := ToAticle(h)
+	// t.Fatal(a)
 	mk := Convert(a)
 	t.Fatal(mk)
 }

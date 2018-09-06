@@ -98,8 +98,9 @@ func B() *Rule {
 	return &Rule{
 		Patterns: []string{"b", "strong"},
 		Replacement: func(innerHTML string, attrs []string) string {
+			// log.Println(innerHTML, attrs)
 			if len(attrs) > 1 && attrs[1] != `` {
-				return wrapInlineTag(attrs[1], "**", "**")
+				return wrapInlineTag(strings.TrimSpace(attrs[1]), "**", "**")
 			}
 			return ""
 		},
@@ -292,7 +293,7 @@ func cleanUp(ct string) string {
 
 	//去除所有尖括号内的HTML代码，并换成换行符
 	re := regexp.MustCompile("\\<[\\S\\s]+?\\>")
-	str = re.ReplaceAllString(str, "\n")
+	str = re.ReplaceAllString(str, "")
 
 	//去除连续的换行符
 	re = regexp.MustCompile("\\s{3,}")
@@ -361,6 +362,7 @@ func wrapInlineTag(content, openWrap, closeWrap string) string {
 }
 
 func init() {
+	AddRule("b", B())
 	AddRule("p", P())
 	AddRule("mpvoice", MPVoice())
 	AddRule("iframe", Iframe())
@@ -368,7 +370,6 @@ func init() {
 	AddRule("h", H())
 	AddRule("hr", Hr())
 	AddRule("img", Img())
-	AddRule("b", B())
 	AddRule("br", Br())
 	AddRule("code", Code())
 	AddRule("a", A())
@@ -384,8 +385,9 @@ func init() {
 func Convert(ct string) string {
 
 	// 过滤掉 span 标签(此标签常常被滥用[不成对出现])
-	content := regexp.MustCompile(`<(\/)?span>`).ReplaceAllString(ct, "")
-
+	// \b[^>]*
+	content := regexp.MustCompile(`<(\/)?span([^>])?>`).ReplaceAllString(ct, "") // \\<[\\S\\s]+?\\>
+	// log.Println(content)
 	for _, rule := range rules {
 		for _, pattern := range rule.Patterns {
 			content = replaceEls(content, pattern, rule.Tp, rule.Replacement)
